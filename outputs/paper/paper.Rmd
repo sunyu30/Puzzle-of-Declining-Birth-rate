@@ -1,0 +1,771 @@
+---
+title: "Puzzle to the decline of birth rate"
+subtitle: "moderate association with age and race post-recession"
+author: 
+  - Yu Sun
+  - Ariel Xu
+  - Qiao Zhou
+thanks: "Code and data are available at: LINK."
+date: "`r format(Sys.time(), '%d %B %Y')`"
+abstract: " This paper replicates the 2022 article ‘The Puzzle of Falling US Birth Rates since the Great Recession”[@123]’, which explores the possible correlation between birth rates and different variables. The goal of our replicates is to improve upon the article and seek more possible relations to the decline in the birthrate. In the end, we have found more evidence through a different perspective to support the original result, and it was consistent "
+output: pdf_document
+toc: True
+bibliography: references.bib
+---
+
+```{r setup, include=FALSE}
+library(haven)
+library(tidyverse)
+library(RStata)
+library(ggplot2)
+library(gridExtra)
+library(here)
+library(readr)
+library(knitr)
+```
+
+\newpage
+# Introduction
+
+It’s undoubtedly to say that the birth rate determines the future of a country. With the current medical technologies, we cannot achieve the state of immortality. For the past decade, it has been a problem that the birth rate is declining at a remarkable speed. According to the National Center for Health Statistics official record, the overall birth rate has achieved another low mark with 63.2 per 1000 women of childbearing age. [@kl] The overall U.S. birth rate has peaked during the baby boom, which reached 122.7 in 1957. [@cita] From observation, we hypothesized a connection between birth rate and recession, thinking that economic disaster will influence the economy.
+
+This paper replicates "The Puzzle of Falling US Birth Rates since the Great Recession"[@123] primarily focuses on the effect of different factors contributing to the birth rate decline, such as education level, age, religious beliefs, and ethnicity. We aim to explore the data further to determine possible hidden associations. We have hypothesized a possible association between age and birth rate and between race and birth rate after the recession period; however, we have found no association between age and birth rate and indirection association between race and birth rate. 
+
+The rest of the paper is organized as follows: In the Data section(section 2), we explain the data background and analysis regarding the potential factors influencing the birth rate. In the Result section(section 3), we show the impact of the chosen variable, age and race, corresponding to the birth rate. In the discussion section(section 4), we made comments regarding this paper and discussed potential bias in the research. Finally, we have suggested potential factors that the author did not include to elaborate future directions of this study.
+
+# Data
+
+```{r,include=FALSE}
+fig1 <- read_csv(here('inputs/data/fig_1.csv'))
+```
+
+```{r,include=FALSE}
+fig2 <- read_csv(here('inputs/data/figs_1_2_3.csv'))
+```
+
+```{r,include=FALSE}
+fig2f <- read_csv(here('inputs/data/fig_2f.csv'))
+```
+
+The research uses `R` language[@citeR] as its foundation, where we have used packages such as `tidyverse`[@tidyverse], `haven`[@haven], `here`[@here], `readr`[@readr] to prepare data for this project.Where we then used `Kable`[@kableExtra] to generate table and `ggplot`[@ggplot2] to generate plots.
+
+## Orginal paper
+This paper is a reproduction and extension of The Puzzle of Falling US Birth Rates since the Great Recession(@123). This paper investigates possible suspects behind the falling birth rate from the great recession. Firstly, the original paper offers a detailed look at the birth rate by demographic groups defined by age, education, race and ethnicity, marital status, and birth parity. Then it explores potential economic, social, and policy factors that might be responsible for the post-2007 decline in the US birth rate. It also compares birth trends in the United States to other highly developed countries to examine international differences in social, economic, and policy environments. The authors further investigate the changes in the cohorts of women moving through their childbearing years, finding that the period- and location-specific factors cannot explain the declining birth rates. For our replication paper, we focus only on the relationship between the declining birth rates after the recession and the two factors (age, race and ethnicity). We will reproduce the figures and tables in the original paper but only focus on these two chosen factors.
+
+## Data Source
+Birth data:
+Birth data is collected from public sources and aggregated from the National Center for Health Statistics (NCHS) restricted-use microdata. Birth rates for all women 15-44 years old, and for women 15-44 disaggregated by age, Hispanic origin (presented in Figures 1, 2) are gathered from Vital Statistics Final Births reports for 2015, 2019, and the 2020 Provisional Birth Report (Martin et al. 2017, Martin et al. 2021, Hamilton et al. 2021). Birth rates disaggregated by nativity birth order (Figure 2) are calculated using public birth microdata across 1980-1989 from the NBER Natality Database and NCHS microdata from 1990-2019 (CDC NCHS 2020, NBER 2021b). 
+
+Population data:
+The paper uses single-age population counts from the CDC SEER database, among all races from 1969-2019 and by race and Hispanic origin from 1990-2019 (CDC NCI 2021). 
+
+## Data analysis
+```{r,echo = FALSE, warning=FALSE}
+ggplot(fig1, aes(year, brate_all)) + geom_line(color = "deepskyblue3", size = 1.2) +  geom_vline(xintercept = 2007,
+                                                                                                linetype = 2,
+                                                                                                color = 3) +
+  geom_text(
+    mapping = aes(x = 2007, y = 70, label = "2007"),
+    size = 5,
+    color = "gray"
+  ) +
+  labs(
+    x = "Year",
+    y = "Birth per 1,000 women age 15-44",
+    title = "Trend in US Birth Rates",
+    caption = " Birth Rates collected from CDC Vital Statistics Births Reports for 2015, 2019 and 2020. See Data Appendix for additional details."
+  ) +scale_x_continuous(breaks = seq(1980, 2020, 5))+ scale_y_continuous(breaks = c(20, 40, 60, 80, 100, 120, 140))+
+  theme(panel.background = element_rect(fill = "gray98"),
+    panel.grid.major.y = element_line(
+      color = "gray",
+      size = 0.5,
+      linetype = 1
+    ),
+    axis.line =  element_line(
+      color = "black",
+      size = 0.5,
+      linetype = 1
+    )
+  )
+```
+First, let’s look at the overall trend in the US birth rate. Figure 1 plots the movement in the US birth rates. The decline began at the Great Recession (2017) and continued during the subsequent recovery, with no signs of reversing.
+
+## Descriptive analysis
+
+```{r,echo=FALSE,warning=FALSE}
+ggplot(fig2, aes(year)) + 
+  geom_line(aes(y = brate_1519), color = "darkviolet", size = 0.8,) +
+  geom_line(aes(y = brate_2024), color = "deepskyblue2", size = 0.8) + 
+  geom_line(aes(y = brate_2529), color = "red", size = 0.8) +
+  geom_line(aes(y = brate_3034), color = "green", size = 0.8) + 
+  geom_line(aes(y = brate_3539), color = "yellow", size = 0.8) +
+  geom_line(aes(y = brate_4044), color = "coral", size = 0.8) + geom_vline(xintercept = 2007,
+                                                                                linetype = 2,
+                                                                                color = 3) +
+  geom_text(
+    mapping = aes(x = 1985, y = 125, label = "Age 25-29"),
+    size = 3,
+    color = "red"
+  ) +
+  geom_text(
+    mapping = aes(x = 1985, y = 100, label = "Age 20-24"),
+    size = 3,
+    color = "deepskyblue2"
+  ) +
+  geom_text(
+    mapping = aes(x = 1985, y = 80, label = "Age 30-34"),
+    size = 3,
+    color = "green"
+  ) +
+  geom_text(
+    mapping = aes(x = 1985, y = 60, label = "Age 15-19"),
+    size = 3,
+    color = "darkviolet"
+  ) +
+  geom_text(
+    mapping = aes(x = 1985, y = 30, label = "Age 35-39"),
+    size = 3,
+    color = "yellow"
+  ) +
+  geom_text(
+    mapping = aes(x = 1985, y = 10, label = "Age 40-44"),
+    size = 3,
+    color = "coral"
+  ) +
+  geom_text(
+    mapping = aes(x = 2007, y = 70, label = "2007"),
+    size = 5,
+    color = "gray"
+  ) +
+  labs(
+    x = "Year",
+    y = "Birth per 1,000 women in 
+    relevant population subgroup",
+    title = "Five-year age group",
+  )+scale_x_continuous(breaks = seq(1980, 2020, 5))+ scale_y_continuous(breaks = c(20, 40, 60, 80, 100, 120, 140))+
+  theme(
+    panel.background = element_rect(fill = "gray98"),
+    panel.grid.major.y = element_line(
+      color = "gray",
+      size = 0.5,
+      linetype = 1
+    ),
+    axis.line =  element_line(
+      color = "black",
+      size = 0.5,
+      linetype = 1
+    ) 
+  )
+```
+
+In Figure 2, we plot birth rates for six different age groups. Birth rates have declined most dramatically in both age group15-19 and 20-24. However, the birth rate in the age group 15-19 is much lower than in the age group 20-24. The birth rate peaked in 1991 at a level of 61.8 births per 1,000 women aged 15 to 19 and peaked in 1990 at 116.5 births per 1,000 women aged 19-24. The pace of that decline slowed approaching 2007 for both groups but then accelerated in the following years for the age group 20-24. Other than teens, the evident decline in birth rates was women aged 25-29, birth rates among women 25 to 29 fell from 118.1 to 90.0 per 1,000 women. For the woman in the older age group, we can see that the birth rate constantly rose from 1980 to 2020, but not nearly enough to make up for these significant declines at younger ages. Thus, we can conclude from figure 1 that the birth rate is strongly related to age. Younger women have had a dramatic declining birth rate since 1990, while the older generation has a relatively constant or rising birth rate from 1980 until now.
+
+However, we can also notice that the decline began far before the great recession from this figure. Hence, there is no clear evidence showing that the great recession directly impacts the birth rate trend in groups of age. To investigate the real cause for the prior-2007 decline, we further look into the trends in births by “parity,” referring to the number of children for a given woman. 
+```{r,echo=FALSE, warning=FALSE}
+fig2 %>% select(year, brate_whitenh, brate_blacknh, brate_hisp) %>% na.omit() %>% ggplot(aes(year)) + 
+  geom_line(aes(y = brate_whitenh), color = "darkviolet", size = 0.8,) +
+  geom_line(aes(y = brate_blacknh), color = "deepskyblue2", size = 0.8) + 
+  geom_line(aes(y = brate_hisp), color = "red", size = 0.8) + geom_vline(xintercept = 2007,
+                                                                                linetype = 2,
+                                                                                color = 3) +
+  geom_text(
+    mapping = aes(x = 2000, y = 115, label = "Hispanic"),
+    size = 3,
+    color = "black"
+  ) +
+  geom_text(
+    mapping = aes(x = 2000, y = 80, label = "Black, non-Hispanic"),
+    size = 3,
+    color = "black"
+  ) +
+  geom_text(
+    mapping = aes(x = 2000, y = 50, label = "White, non-Hispanic"),
+    size = 3,
+    color = "black"
+  ) +
+  geom_text(
+    mapping = aes(x = 2007, y = 120, label = "2007"),
+    size = 5,
+    color = "gray"
+  ) +
+  labs(
+    x = "Year",
+    y = "Birth per 1,000 women 
+    in relevant population subgroup",
+    title = "Race and ethnicity (ages 15-44)",
+  )+scale_x_continuous(limit = c(1990, 2020) , breaks = seq(1990, 2020, 5))+ scale_y_continuous(limit = c(0, 140), breaks = c(0, 20, 40, 60, 80, 100, 120, 140))+
+  theme(
+    panel.background = element_rect(fill = "gray98"),
+    panel.grid.major.y = element_line(
+      color = "gray",
+      size = 0.5,
+      linetype = 1
+    ),
+    axis.line =  element_line(
+      color = "black",
+      size = 0.5,
+      linetype = 1
+    ) 
+  )
+```
+
+We next examine birth rates by race and ethnicity, as shown in Figure 3. Hispanics have experienced the most dramatic recent declines in birth rates. In 2007, the birth rate among Hispanic women was 97.4; it fell to 62.8 by 2020. Birth rates for Black and White non-Hispanic women also fell by much smaller. Birth rates differed dramatically by race and ethnicity when the Great Recession hit. By 2020, racial and ethnic differences in birth rate levels remain, but they have become much smaller. Different from the birth rate trend in figure 2, all races’ birth rates started to fall from 2007, indicating a possible correlation between the great recession and the movement in birth rate by race and ethnicity.
+
+In figure 3, we notice that Hispanics still have the most significant birth rate among races even though it declines dramatically. Then, we want to investigate further the birth rates among native- and foreign-born Hispanics. 
+
+```{r,echo=FALSE, warning=FALSE}
+fig2 %>% select(year, brate_native_mex, brate_foreign_mex, brate_native_hisp_nonmex, brate_foreign_hisp_nonmex) %>% na.omit() %>%  ggplot(aes(year)) + 
+  geom_line(aes(y = brate_native_mex), color = "darkviolet", size = 0.8,) +
+  geom_line(aes(y = brate_foreign_mex), color = "deepskyblue2", size = 0.8) + 
+  geom_line(aes(y = brate_native_hisp_nonmex), color = "red", size = 0.8)+ 
+  geom_line(aes(y = brate_foreign_hisp_nonmex), color = "orange", size = 0.8) + geom_vline(xintercept = 2007,
+                                                                                linetype = 2,
+                                                                                color = 3) +
+  geom_text(
+    mapping = aes(x = 2000, y = 100, label = "Foreign-born-non-Mexican"),
+    size = 3,
+    color = "black"
+  ) +
+  geom_text(
+    mapping = aes(x = 2000, y = 50, label = "Native-born-non-Mexican"),
+    size = 3,
+    color = "black"
+  ) +
+  geom_text(
+    mapping = aes(x = 2013, y = 130, label = "Foreign-born-Mexican"),
+    size = 3,
+    color = "black"
+  ) +geom_text(
+    mapping = aes(x = 2015, y = 40, label = "Native-born-Mexican"),
+    size = 3,
+    color = "black"
+  ) +
+  geom_text(
+    mapping = aes(x = 2007, y = 160, label = "2007"),
+    size = 5,
+    color = "gray"
+  ) +
+  labs(
+    x = "Year",
+    y = "Birth per 1,000 women 
+    in relevant population subgroup",
+    title = "Hispanic subpopulation (ages 15-44)(fig3)",
+  )+scale_x_continuous(limit = c(1990, 2020) , breaks = seq(1990, 2020, 5))+ scale_y_continuous(limit = c(0, 180), breaks =seq(0, 180, 20))+
+  theme(
+    panel.background = element_rect(fill = "gray98"),
+    panel.grid.major.y = element_line(
+      color = "gray",
+      size = 0.5,
+      linetype = 1
+    ),
+    axis.line =  element_line(
+      color = "black",
+      size = 0.5,
+      linetype = 1
+    ) 
+  )
+```
+
+In Figure 4, we look separately at birth rates among native- and foreign-born Hispanics and further segment Hispanics into countries of origin. Among those with Mexican heritage, birth rates are considerably higher among foreign-born women than among native-born women. However, birth rates among both groups have fallen rapidly since 2007. The difference is the native-born-Mexican remained a pretty constant trend in the birth rate before 2007 while the foreign-born-Mexican had a fluctuating birth rate. Birth rates have not changed much over time for Hispanic women not of Mexican origin in the United States, regardless of their nativity. Thus, we can conclude that the recession is more likely to influence the Hispanics with Mexican heritage. And the dramatic decline of the birth rate of Hispanics is mainly contributed by the Hispanics with Mexican heritage.
+
+
+```{r, fig.cap='fig4',echo=FALSE, warning=FALSE}
+ggplot(fig2f, aes(year)) + 
+  geom_line(aes(y = brate_firstbirth), color = "darkviolet", size = 0.8,) +
+  geom_line(aes(y = brate_secondbirth), color = "deepskyblue2", size = 0.8) + 
+  geom_line(aes(y = brate_thirdbirth), color = "red", size = 0.8)+ 
+  geom_line(aes(y = brate_fourthplusbirth), color = "orange", size = 0.8) + geom_vline(xintercept = 2007,
+                                                                                linetype = 2,
+                                                                                color = 3) + 
+  geom_text(
+    mapping = aes(x = 1995, y = 28, label = "First Birth"),
+    size = 3,
+    color = "black"
+  ) +
+  geom_text(
+    mapping = aes(x = 1995, y = 23, label = "Second Birth"),
+    size = 3,
+    color = "black"
+  ) +
+  geom_text(
+    mapping = aes(x = 1995, y = 12, label = "Third Birth"),
+    size = 3,
+    color = "black"
+  ) +geom_text(
+    mapping = aes(x = 1995, y = 8, label = "Fourth+ Birth"),
+    size = 3,
+    color = "black"
+  ) +
+  geom_text(
+    mapping = aes(x = 2007, y = 40, label = "2007"),
+    size = 5,
+    color = "gray"
+  ) +
+  labs(
+    x = "Year",
+    y = "Birth per 1,000 women 
+    in relevant population subgroup",
+    title = "Parity(15-44)(fig4)",
+  )+scale_x_continuous(limit = c(1990, 2020) , breaks = seq(1990, 2020, 5))+ scale_y_continuous(limit = c(0, 40), breaks =seq(0, 180, 20))+
+  theme(
+    panel.background = element_rect(fill = "gray98"),
+    panel.grid.major.y = element_line(
+      color = "gray",
+      size = 0.5,
+      linetype = 1
+    ),
+    axis.line =  element_line(
+      color = "black",
+      size = 0.5,
+      linetype = 1
+    ) 
+  )
+```
+From figure 5, we can see the trend lines for third and higher-order birth are much flatter over this period than for first and second order. First births declined the most, from a rate of 27.6 per 1,000 women of childbearing age to 21.9 per 1,000 women, a drop of 5.7 births. Second births fell from 21.9 to 18.7, a decline of 3.2 births. These data are somehow consistent with what we found before. Since the older generation of women tends to have more children compared to the younger woman at the same time, the more senior women’s birth rates were relatively stable. Also, these data reveal that the post-2007 decline in births is driven more by a reduction in initial childbearing (first births) than by women having larger families (third and higher-order births). 
+
+
+
+```{r, include=FALSE}
+t1_row_population <- read_dta(here('inputs/data/cps_19902019.dta'))
+```
+
+
+```{r, include=FALSE, warning=FALSE}
+t1_populaiton_1 <- t1_row_population %>% filter(hflag ==0 | is.na(hflag)) %>% filter(sex != 1) %>% filter(age>=15 & age<=44) %>% mutate(
+  edgrp = case_when(
+    educ <= 71 ~ "lesshs",
+    educ >= 72 & educ <= 73 ~ "hsgrad",
+    educ >= 80 &
+      educ <= 100 ~ "somcoll",
+    educ > 100 ~ "colgrad"
+  )
+) 
+```
+
+```{r, include=FALSE}
+t1_populaiton_1 <- t1_populaiton_1 %>% mutate(agegrp = case_when(
+age<=19 ~ "1519",  
+age>19 & age<=24 ~ "2024",  
+age>24 & age<=34 ~ "2534",
+age>34 ~ "3544"))
+
+```
+
+```{r, include=FALSE}
+t1_populaiton_1 <- t1_populaiton_1 %>% mutate(agegrp6 = case_when(
+age<=19 ~ "1519",  
+age>19 & age<=24 ~ "2024",
+age>24 & age<=29 ~ "2529",
+age>29 & age<=34 ~ "2934",
+age>34 & age<=39 ~ "3539",
+age>39 ~ "4044"))
+```
+
+```{r, include=FALSE}
+t1_populaiton_1 <-
+  t1_populaiton_1 %>% mutate(married = case_when(marst == 1 |
+                                                   marst ==
+                                                   2 ~ "married",
+                                                 marst >
+                                                   2 ~ "unmarried"))
+```
+
+```{r, include=FALSE}
+t1_populaiton_1 <- t1_populaiton_1 %>% mutate(
+  raceeth = case_when(
+    race == 100 & hispan == 0 ~ "whitenh",
+    race == 200 & hispan == 0 ~ "blacknh",
+    hispan > 0 ~ "hisp"
+  )
+) %>% drop_na(raceeth)
+```
+
+```{r, include=FALSE}
+t1_populaiton_1 <-
+  t1_populaiton_1 %>% mutate(
+    native = case_when(
+      nativity >= 1 & nativity <= 4 ~ "nativeborn",
+      nativity == 5 ~ "foreignborn",
+      nativity == 0 ~ ""
+    )
+  )
+```
+
+```{r, include=FALSE}
+t1_populaiton_1 <-
+  t1_populaiton_1 %>% mutate(mexican = case_when(hispan >= 100 &
+                                                   hispan <= 108 ~ "mexican",
+                                                 hispan >
+                                                   0 & TRUE ~ "other"))  
+```
+
+```{r, include=FALSE}
+t1_populaiton_1 <-
+  t1_populaiton_1 %>% mutate(
+    mexicob = case_when(
+      native == "foreignborn" &
+        bpl == 20000 ~ "mexico" ,
+      native == "foreignborn" & bpl != 20000 ~ "other"
+    )
+  )
+```
+
+```{r, include=FALSE}
+t1_populaiton_2 <-
+  t1_populaiton_1 %>% mutate(edgrp = ifelse(agegrp6=="1519", "all",edgrp))
+```
+
+```{r, include=FALSE}
+t1_population_3 <- t1_populaiton_2 %>% group_by(year,agegrp6,raceeth) %>% summarise(pop = sum(asecwth))
+```
+
+```{r, include=FALSE}
+ t1_populaiton_new <- t1_population_3 %>% select(year,agegrp6,raceeth,pop) %>% mutate(agegrp6_raceeth = paste(agegrp6,raceeth, sep = "_")) %>% select(-"agegrp6", -"raceeth")
+```
+
+```{r, include=FALSE}
+t1_populaiton_new <- t1_populaiton_new %>% select(-"agegrp6")
+```
+
+```{r, include=FALSE}
+pop_year <- t1_populaiton_new %>% group_by(year) %>% summarise(all_pop = sum(pop))
+pop_07 <- t1_populaiton_new %>% filter(year == 2007)
+pop_19 <- t1_populaiton_new %>% filter(year == 2019)
+```
+
+```{r, include=FALSE}
+t1_brate <- read_csv(here("inputs/data/births_educ_race_age6.csv"))
+glimpse(t1_brate)
+```
+
+```{r, include=FALSE}
+t1_brate <-
+  t1_brate %>% mutate(
+    WHN_2024 = numbirth_lesshs_whitenh_2024 + numbirth_hsgrad_whitenh_2024 +
+      numbirth_somecoll_whitenh_2024 + numbirth_colgrad_whitenh_2024
+  )
+t1_brate <-
+  t1_brate %>% mutate(
+    WHN_2529 = numbirth_lesshs_whitenh_2529 + numbirth_hsgrad_whitenh_2529 +
+      numbirth_somecoll_whitenh_2529 + numbirth_colgrad_whitenh_2529
+  )
+t1_brate <-
+  t1_brate %>% mutate(
+    WHN_3034 = numbirth_lesshs_whitenh_3034 + numbirth_hsgrad_whitenh_3034 +
+      numbirth_somecoll_whitenh_3034 + numbirth_colgrad_whitenh_3034
+  )
+t1_brate <-
+  t1_brate %>% mutate(
+    WHN_3539 = numbirth_lesshs_whitenh_3539 + numbirth_hsgrad_whitenh_3539 +
+      numbirth_somecoll_whitenh_3539 + numbirth_colgrad_whitenh_3539
+  )
+t1_brate <-
+  t1_brate %>% mutate(
+    WHN_4044 = numbirth_lesshs_whitenh_4044 + numbirth_hsgrad_whitenh_4044 +
+      numbirth_somecoll_whitenh_4044 + numbirth_colgrad_whitenh_4044
+  )
+```
+
+```{r, include=FALSE}
+t1_brate <-
+  t1_brate %>% mutate(
+    BHN_2024 = numbirth_lesshs_blacknh_2024 + numbirth_hsgrad_blacknh_2024 +
+      numbirth_somecoll_blacknh_2024 + numbirth_colgrad_blacknh_2024
+  )
+t1_brate <-
+  t1_brate %>% mutate(
+    BHN_2529 = numbirth_lesshs_blacknh_2529 + numbirth_hsgrad_blacknh_2529 +
+      numbirth_somecoll_blacknh_2529 + numbirth_colgrad_blacknh_2529
+  )
+t1_brate <-
+  t1_brate %>% mutate(
+    BHN_3034 = numbirth_lesshs_blacknh_3034 + numbirth_hsgrad_blacknh_3034 +
+      numbirth_somecoll_blacknh_3034 + numbirth_colgrad_blacknh_3034
+  )
+t1_brate <-
+  t1_brate %>% mutate(
+    BHN_3539 = numbirth_lesshs_blacknh_3539 + numbirth_hsgrad_blacknh_3539 +
+      numbirth_somecoll_blacknh_3539 + numbirth_colgrad_blacknh_3539
+  )
+t1_brate <-
+  t1_brate %>% mutate(
+    BHN_4044 = numbirth_lesshs_blacknh_4044 + numbirth_hsgrad_blacknh_4044 +
+      numbirth_somecoll_blacknh_4044 + numbirth_colgrad_blacknh_4044
+  )
+```
+
+```{r, include=FALSE}
+t1_brate <-
+  t1_brate %>% mutate(
+    HIS_2024 = numbirth_lesshs_hisp_2024 + numbirth_hsgrad_hisp_2024 +
+      numbirth_somecoll_hisp_2024 + numbirth_colgrad_hisp_2024
+  )
+t1_brate <-
+  t1_brate %>% mutate(
+    HIS_2529 = numbirth_lesshs_hisp_2529 + numbirth_hsgrad_hisp_2529 +
+      numbirth_somecoll_hisp_2529 + numbirth_colgrad_hisp_2529
+  )
+t1_brate <-
+  t1_brate %>% mutate(
+    HIS_3034 = numbirth_lesshs_hisp_3034 + numbirth_hsgrad_hisp_3034 +
+      numbirth_somecoll_hisp_3034 + numbirth_colgrad_hisp_3034
+  )
+t1_brate <-
+  t1_brate %>% mutate(
+    HIS_3539 = numbirth_lesshs_hisp_3539 + numbirth_hsgrad_hisp_3539 +
+      numbirth_somecoll_hisp_3539 + numbirth_colgrad_hisp_3539
+  )
+t1_brate <-
+  t1_brate %>% mutate(
+    HIS_4044 = numbirth_lesshs_hisp_4044 + numbirth_hsgrad_hisp_4044 +
+      numbirth_somecoll_hisp_4044 + numbirth_colgrad_hisp_4044
+  )
+```
+
+```{r, include=FALSE}
+t1_brate_new <- t1_brate %>% select(year, WHN_2024, WHN_3034, WHN_4044, WHN_2529, WHN_3539, BHN_2024, BHN_3034, BHN_4044, BHN_2529, BHN_3539, HIS_2024, HIS_3034, HIS_4044, HIS_2529, HIS_3539, numbirth_all_1519_whitenh, numbirth_all_1519_blacknh, numbirth_all_1519_hisp)
+```
+
+```{r, include=FALSE}
+brate_07 <- t1_brate_new %>% filter(year == 2007)
+brate_19 <- t1_brate_new %>% filter(year == 2019)
+```
+
+```{r, include=FALSE}
+WHN_1519_b07 <- brate_07$numbirth_all_1519_whitenh[1]/pop_07$pop[3]*1000
+WHN_2024_b07 <- brate_07$WHN_2024[1]/pop_07$pop[6]*1000
+WHN_2529_b07 <- brate_07$WHN_2529[1]/pop_07$pop[9]*1000
+WHN_3034_b07 <- brate_07$WHN_3034[1]/pop_07$pop[12]*1000
+WHN_3539_b07 <- brate_07$WHN_3539[1]/pop_07$pop[15]*1000
+WHN_4044_b07 <- brate_07$WHN_4044[1]/pop_07$pop[18]*1000
+
+```
+```{r, include=FALSE}
+BHN_1519_b07 <- brate_07$numbirth_all_1519_blacknh[1]/pop_07$pop[1]*1000
+BHN_2024_b07 <- brate_07$BHN_2024[1]/pop_07$pop[4]*1000
+BHN_2529_b07 <- brate_07$BHN_2529[1]/pop_07$pop[7]*1000
+BHN_3034_b07 <- brate_07$BHN_3034[1]/pop_07$pop[10]*1000
+BHN_3539_b07 <- brate_07$BHN_3539[1]/pop_07$pop[13]*1000
+BHN_4044_b07 <- brate_07$BHN_4044[1]/pop_07$pop[16]*1000
+```
+```{r, include=FALSE}
+HIS_1519_b07 <- brate_07$numbirth_all_1519_hisp[1]/pop_07$pop[2]*1000
+HIS_2024_b07 <- brate_07$HIS_2024[1]/pop_07$pop[5]*1000
+HIS_2529_b07 <- brate_07$HIS_2529[1]/pop_07$pop[8]*1000
+HIS_3034_b07 <- brate_07$HIS_3034[1]/pop_07$pop[11]*1000
+HIS_3539_b07 <- brate_07$HIS_3539[1]/pop_07$pop[14]*1000
+HIS_4044_b07 <- brate_07$HIS_4044[1]/pop_07$pop[17]*1000
+```
+
+
+
+
+```{r, include=FALSE}
+WHN_1519_b19 <- brate_19$numbirth_all_1519_whitenh[1]/pop_19$pop[3]*1000
+WHN_2024_b19 <- brate_19$WHN_2024[1]/pop_19$pop[6]*1000
+WHN_2529_b19 <- brate_19$WHN_2529[1]/pop_19$pop[9]*1000
+WHN_3034_b19 <- brate_19$WHN_3034[1]/pop_19$pop[12]*1000
+WHN_3539_b19 <- brate_19$WHN_3539[1]/pop_19$pop[15]*1000
+WHN_4044_b19 <- brate_19$WHN_4044[1]/pop_19$pop[18]*1000
+```
+
+```{r, include=FALSE}
+BHN_1519_b19 <- brate_19$numbirth_all_1519_blacknh[1]/pop_19$pop[1]
+BHN_2024_b19 <- brate_19$BHN_2024[1]/pop_19$pop[4]*1000
+BHN_2529_b19 <- brate_19$BHN_2529[1]/pop_19$pop[7]*1000
+BHN_3034_b19 <- brate_19$BHN_3034[1]/pop_19$pop[10]*1000
+BHN_3539_b19 <- brate_19$BHN_3539[1]/pop_19$pop[13]*1000
+BHN_4044_b19 <- brate_19$BHN_4044[1]/pop_19$pop[16]*1000
+```
+
+```{r, include=FALSE}
+HIS_1519_b19 <- brate_19$numbirth_all_1519_hisp[1]/pop_19$pop[2]*1000
+HIS_2024_b19 <- brate_19$HIS_2024[1]/pop_19$pop[5]*1000
+HIS_2529_b19 <- brate_19$HIS_2529[1]/pop_19$pop[8]*1000
+HIS_3034_b19 <- brate_19$HIS_3034[1]/pop_19$pop[11]*1000
+HIS_3539_b19 <- brate_19$HIS_3539[1]/pop_19$pop[14]*1000
+HIS_4044_b19 <- brate_19$HIS_4044[1]/pop_19$pop[17]*1000
+```
+
+```{r, include=FALSE}
+C_brate_WHN1519 <- WHN_1519_b19 - WHN_1519_b07
+C_brate_WHN2024 <- WHN_2024_b19 - WHN_2024_b07
+C_brate_WHN2529 <- WHN_2529_b19 - WHN_2529_b07
+C_brate_WHN3034 <- WHN_3034_b19 - WHN_3034_b07
+C_brate_WHN3539 <- WHN_3539_b19 - WHN_3539_b07
+C_brate_WHN4044 <- WHN_4044_b19 - WHN_4044_b07
+```
+
+```{r, include=FALSE}
+C_brate_BHN1519 <- BHN_1519_b19 - BHN_1519_b07
+C_brate_BHN2024 <- BHN_2024_b19 - BHN_2024_b07
+C_brate_BHN2529 <- BHN_2529_b19 - BHN_2529_b07
+C_brate_BHN3034 <- BHN_3034_b19 - BHN_3034_b07
+C_brate_BHN3539 <- BHN_3539_b19 - BHN_3539_b07
+C_brate_BHN4044 <- BHN_4044_b19 - BHN_4044_b07
+```
+
+```{r, include=FALSE}
+C_brate_HIS1519 <- HIS_1519_b19 - HIS_1519_b07
+C_brate_HIS2024 <- HIS_2024_b19 - HIS_2024_b07
+C_brate_HIS2529 <- HIS_2529_b19 - HIS_2529_b07
+C_brate_HIS3034 <- HIS_3034_b19 - HIS_3034_b07
+C_brate_HIS3539 <- HIS_3539_b19 - HIS_3539_b07
+C_brate_HIS4044 <- HIS_4044_b19 - HIS_4044_b07
+```
+
+```{r, include=FALSE}
+pc_pop_WHN_1519 <- pop_07$pop[3]/pop_year$all_pop[18]*100
+pc_pop_WHN_2024 <- pop_07$pop[6]/pop_year$all_pop[18]*100
+pc_pop_WHN_2529 <- pop_07$pop[9]/pop_year$all_pop[18]*100
+pc_pop_WHN_3034 <- pop_07$pop[12]/pop_year$all_pop[18]*100
+pc_pop_WHN_3539 <- pop_07$pop[15]/pop_year$all_pop[18]*100
+pc_pop_WHN_4044 <- pop_07$pop[18]/pop_year$all_pop[18]*100
+```
+
+```{r, include=FALSE}
+pc_pop_BHN_1519 <- pop_07$pop[1]/pop_year$all_pop[18]*100
+pc_pop_BHN_2024 <- pop_07$pop[4]/pop_year$all_pop[18]*100
+pc_pop_BHN_2529 <- pop_07$pop[7]/pop_year$all_pop[18]*100
+pc_pop_BHN_3034 <- pop_07$pop[10]/pop_year$all_pop[18]*100
+pc_pop_BHN_3539 <- pop_07$pop[13]/pop_year$all_pop[18]*100
+pc_pop_BHN_4044 <- pop_07$pop[16]/pop_year$all_pop[18]*100
+```
+
+```{r, include=FALSE}
+pc_pop_HIS_1519 <- pop_07$pop[2]/pop_year$all_pop[18]*100
+pc_pop_HIS_2024 <- pop_07$pop[5]/pop_year$all_pop[18]*100
+pc_pop_HIS_2529 <- pop_07$pop[8]/pop_year$all_pop[18]*100
+pc_pop_HIS_3034 <- pop_07$pop[11]/pop_year$all_pop[18]*100
+pc_pop_HIS_3539 <- pop_07$pop[14]/pop_year$all_pop[18]*100
+pc_pop_HIS_4044 <- pop_07$pop[17]/pop_year$all_pop[18]*100
+```
+
+```{r, include=FALSE}
+term1_WHN_1519 <- pc_pop_WHN_1519 * C_brate_WHN1519 
+term1_WHN_2024 <- pc_pop_WHN_2024 * C_brate_WHN2024
+term1_WHN_2529 <- pc_pop_WHN_2529 * C_brate_WHN2529
+term1_WHN_3034 <- pc_pop_WHN_3034 * C_brate_WHN3034
+term1_WHN_3539 <- pc_pop_WHN_3539 * C_brate_WHN3539
+term1_WHN_4044 <- pc_pop_WHN_4044 * C_brate_WHN4044
+```
+
+```{r, include=FALSE}
+term1_BHN_1519 <- pc_pop_BHN_1519 * C_brate_BHN1519
+term1_BHN_2024 <- pc_pop_BHN_2024 * C_brate_BHN2024
+term1_BHN_2529 <- pc_pop_BHN_2529 * C_brate_BHN2529
+term1_BHN_3034 <- pc_pop_BHN_3034 * C_brate_BHN3034
+term1_BHN_3539 <- pc_pop_BHN_3539 * C_brate_BHN3539
+term1_BHN_4044 <- pc_pop_BHN_4044 * C_brate_BHN4044
+```
+
+```{r, include=FALSE}
+term1_HIS_1519 <- pc_pop_HIS_1519 * C_brate_HIS1519
+term1_HIS_2024 <- pc_pop_HIS_2024 * C_brate_HIS2024
+term1_HIS_2529 <- pc_pop_HIS_2529 * C_brate_HIS2529
+term1_HIS_3034 <- pc_pop_HIS_3034 * C_brate_HIS3034
+term1_HIS_3539 <- pc_pop_HIS_3539 * C_brate_HIS3539
+term1_HIS_4044 <- pc_pop_HIS_4044 * C_brate_HIS4044
+```
+
+```{r, include=FALSE}
+sum_term1 <- sum(term1_WHN_1519,term1_WHN_2024, term1_WHN_2529, term1_WHN_3034, term1_WHN_3539, term1_WHN_4044, term1_BHN_1519,term1_BHN_2024, term1_BHN_2529, term1_BHN_3034, term1_BHN_3539, term1_BHN_4044,term1_HIS_1519,term1_HIS_2024, term1_HIS_2529, term1_HIS_3034, term1_HIS_3539, term1_HIS_4044)
+```
+
+```{r, include=FALSE}
+con_WHN_1519 <- term1_WHN_1519/sum_term1*100 
+con_WHN_2024 <- term1_WHN_2024/sum_term1*100 
+con_WHN_2529 <- term1_WHN_2529/sum_term1*100 
+con_WHN_3034 <- term1_WHN_3034/sum_term1*100 
+con_WHN_3539 <- term1_WHN_3539/sum_term1*100 
+con_WHN_4044 <- term1_WHN_4044/sum_term1*100 
+con_BHN_1519 <- term1_BHN_1519/sum_term1*100 
+con_BHN_2024 <- term1_BHN_2024/sum_term1*100 
+con_BHN_2529 <- term1_BHN_2529/sum_term1*100 
+con_BHN_3034 <- term1_BHN_3034/sum_term1*100 
+con_BHN_3539 <- term1_BHN_3539/sum_term1*100 
+con_BHN_4044 <- term1_BHN_4044/sum_term1*100 
+con_HIS_1519 <- term1_HIS_1519/sum_term1*100 
+con_HIS_2024 <- term1_HIS_2024/sum_term1*100 
+con_HIS_2529 <- term1_HIS_2529/sum_term1*100 
+con_HIS_3034 <- term1_HIS_3034/sum_term1*100 
+con_HIS_3539 <- term1_HIS_3539/sum_term1*100 
+con_HIS_4044 <- term1_HIS_4044/sum_term1*100 
+```
+
+
+```{r, include=FALSE}
+race_age <- c("Age 15-19, White NH", "Age 20-24, White NH","Age 25-29, White NH","Age 30-34, White NH","Age 35-39, White NH","Age 40-44, White NH","Age 15-19, Black NH", "Age 20-24, Black NH","Age 25-29, Black NH","Age 30-34, Black NH","Age 35-39, Black NH","Age 40-44, Black NH","Age 15-19, HIspanic", "Age 20-24, HIspanic","Age 25-29, HIspanic","Age 30-34, HIspanic","Age 35-39, HIspanic","Age 40-44, HIspanic")
+
+contribution <- c(con_WHN_1519,con_WHN_2024, con_WHN_2529, con_WHN_3034, con_WHN_3539, con_WHN_4044, con_BHN_1519,con_BHN_2024, con_BHN_2529, con_BHN_3034, con_BHN_3539, con_BHN_4044,con_HIS_1519,con_HIS_2024, con_HIS_2529, con_HIS_3034, con_HIS_3539, con_HIS_4044)
+
+pop_percent <- c(pc_pop_WHN_1519, pc_pop_WHN_2024, pc_pop_WHN_2529, pc_pop_WHN_3034, pc_pop_WHN_3539, pc_pop_WHN_4044, pc_pop_BHN_1519, pc_pop_BHN_2024, pc_pop_BHN_2529, pc_pop_BHN_3034, pc_pop_BHN_3539, pc_pop_BHN_4044, pc_pop_HIS_1519, pc_pop_HIS_2024, pc_pop_HIS_2529, pc_pop_HIS_3034, pc_pop_HIS_3539, pc_pop_HIS_4044)
+
+Birthrate_2007 <- c(WHN_1519_b07, WHN_2024_b07, WHN_2529_b07, WHN_3034_b07, WHN_3539_b07, WHN_4044_b07, BHN_1519_b07, BHN_2024_b07, BHN_2529_b07, BHN_3034_b07, BHN_3539_b07, BHN_4044_b07, HIS_1519_b07, HIS_2024_b07, HIS_2529_b07, HIS_3034_b07, HIS_3539_b07, HIS_4044_b07)
+
+Birthrate_2019 <- c(WHN_1519_b19, WHN_2024_b19, WHN_2529_b19, WHN_3034_b19, WHN_3539_b19, WHN_4044_b19, BHN_1519_b19, BHN_2024_b19, BHN_2529_b19, BHN_3034_b19, BHN_3539_b19, BHN_4044_b19, HIS_1519_b19, HIS_2024_b19, HIS_2529_b19, HIS_3034_b19, HIS_3539_b19, HIS_4044_b19)
+
+change_0719 <- c(C_brate_WHN1519, C_brate_WHN2024, C_brate_WHN2529, C_brate_WHN3034, C_brate_WHN3539, C_brate_WHN4044, C_brate_BHN1519, C_brate_BHN2024, C_brate_BHN2529, C_brate_BHN3034, C_brate_BHN3539, C_brate_BHN4044, C_brate_HIS1519, C_brate_HIS2024, C_brate_HIS2529, C_brate_HIS3034, C_brate_HIS3539, C_brate_HIS4044)
+```
+
+```{r, include=FALSE}
+table1_data <- data.frame(race_age, contribution, pop_percent, Birthrate_2007, Birthrate_2019, change_0719)
+```
+
+```{r, include=FALSE}
+print(table1_data)
+```
+
+```{r, include=FALSE}
+table1_data_sort <- table1_data[order(table1_data$contribution, decreasing = TRUE),]
+print(table1_data_sort)
+```
+
+```{r, echo = FALSE}
+knitr::kable(table1_data_sort, col.names = c("Group", "Relative contribution to declining birth rates (%)", "2007 share of population (%)", "2007 birth rate", "2019 birth rate", "2007-19 change in birth rate"), caption = "Demographic Groups' Contribution to the 2007-2019 US Birth Rate Declination", digits = 1, align=c("l", rep('c',times=5)))
+```
+
+# Results
+
+This section decomposes the post-2007 decline in the aggregate birth rate to drops within demographic groups and changes in demographic group’s population shares. We also identify which demographic groups have contributed the most to the overall decline, either because they experienced a substantial reduction in their birth rate or a substantial share of the population. Specifically, we decompose the overall change into the contribution of changing within-group birth rates, the gift of differences in group population shares, and the interaction of a group’s varying rates and changing population shares. Our decomposition is based on categorizing the population of women of child-bearing age into demographic groups defined by the interaction of three race/ ethnic groups (White non-Hispanic, Black non-Hispanic, and Hispanic), six five-year age groups (15 to 19 through 40 to 44). This breakdown results in 18 subgroups. We focus on explaining changes in birth rates between 2007 and 2019, the period of rapidly declining fertility. 
+
+Two points are made evident in this practice. First, the dropping birth rate after 2007 is due to shifting birth rates within demographic groups, not changing population proportions. Between 2007 and 2019, the birth rate for women aged 15 to 44 dropped by 10.8 per 1,000. (from 69.1 to 58.3). Between 2007 and 2019, the birth rate would have grown by 2.6 births per thousand if birth rates remained steady and only population shares varied. On the other hand, if population shares remained constant and only within-group birth rates changed over time (as measured by the first term), the total birth rate would have decreased by 12.8 births per 1,000 women. 
+
+Second, this decomposition highlights the importance of the relative size of a demographic group when accounting for the overall decline in the birth rates. Table 1 reports all the demographic groups’ contributions to the declining birth rate. White non-Hispanic aged 20-24 contributed the largest share, explaining 20.5 percent of the overall decline, while their birth rate didn’t fall dramatically, from 89.5 to 24.7 over the period. Since White non-Hispanic people aged 20-24 have a large population share at 10.4%, they contributed the most to the overall decline even though their birth rate doesn’t decline much. Other demographic groups with smaller reductions in their birth rate also contributed extensively to the general decrease because of their relatively large population shares. For instance, the third-largest contributing group is White Non-Hispanics women between 25 and 29; their birth rate fell from 110.9 to 92.2, accounting for 13.6 percent of the overall decline. In contrast, demographic groups with dramatic decreases in their birth rate didn’t contribute as much as we expect to the general reduction because of their relatively small population shares. For instance, the eighth-largest contributing group is Black Non-Hispanics women between the ages of 20 and 24; their birth rate fell dramatically from 152.2 to 106.2, but only accounting for 7.2 percent of the overall decline.
+
+# Discussion
+Some thoughts on the declining birth rate:
+In this paper, we investigate the relationships between the decline of the birth rates after the recession and the two factors (age, race and ethnicity). However, we did not stress the importance of the declining birth rate. Also, we did not make an overall judgement on whether the decline in the US birth rate should be viewed as an overall positive or negative development.First, I want to discuss why the declining birth rate is significant? As mentioned above, the US birth rate has been declining since the great recession and has no sign of reversing. A persistent decline in births across age groups will eventually affect population composition and size. If birth rates remain persistently low, the US population will age and potentially shrink. In general, population aging is likely to have its most substantive effect on the overall level of productivity in an economy where technical knowledge is changing rapidly and intense competition necessitates a high degree of adaptability of the labour force.[@ESC] So if we consider this perspective, the constant declining birth rate can be seen as a negative development since it accompanies multiple political, economic, and even labour supply issues. However, on the ethical stage, having children is every woman’s personal choice; we shouldn’t judge them about it. But the declining birth rate can have good sides as well.
+
+Another possible explanation could be explained through an alternative perspective on the decline of birth rate in us, such as confidence in the existence of God. Many people today have beliefs and are mentally dependent on them; it has shown that first time, fewer than half of Americans believe that God exists and have no doubts regarding its existence.[@god] It could tie to the recession; someone in a desperate situation would perhaps seek religious help. This trend of decreasing in the belief of existence will get worsen. Human reproduction has always been a sacred testimony in the Christian religion, and believers are taught it is forbidden to do it for pleasure. It also conflicts with the modernized view toward sexual activities, and people are encouraged to have protective sex, which causes fewer birth reiterates. Another factor to consider could be the confidence level of its situation, financially and mentally. The event baby boom referred to the years between 1946 to 1964 when Americans were confident of their position and ultimately increased productivity in the economy. Conversely, if the economy is terrible, such as the covid-19 we are currently enduring, it will diminish and postpone the urge of having a baby in this era which causes a decrease in the birth rate.
+
+For example, slower population growth increases economic opportunities for women and minority groups and exerts upward pressure on wages, especially unskilled labour. For a given rate of capital investment, slower population growth also raises capital per person, raising productivity. Also, some scientists claim that slower population growth lessens America’s contributions to climate change, biodiversity loss, deforestation, and pollution from commercial, industrial, agricultural, and domestic activities, such as heating and cooling buildings and fueling transport. What’s more, slower population growth makes it easier for governments, schools, and civic and religious organizations to respond more fully to increasing demands. So, if we consider things in this aspect, we can also view the declining birth rate as a positive development. Such an essential decision is quite hard for us to make in this paper since we only have a limited dataset, and hopefully, this will be solved in the future.
+
+One of the variable years shows the year when the data is collected, and the rest 18 variables represent the number of births in each of the six age groups and three ethnic groups in each year, where the starting three letters represent the race group and the following four numbers represent the age group. WHN means non-Hispanic white women for the race group, BHN means non-Hispanic black women and Hispanic women. For the age group, the first two numbers represent the lower limit of the age group, while the last two numbers represent the upper limit of the age group. Combining data from the two tables, we divided the number of births by the population to find birth rates for each age group and ethnic group in 2007 and 2019. From this data, we can calculate the change in birth rates from 2007 to 2019. Besides, the share of population for each group is calculated as the percent of the group in the whole population. Based on the results above, we generate each group’s relative contribution to declining birth rates by multiplying the percent of the shared population with the group’s birth rate then sum the number for all groups. The contribution is the percent of each group in the sum number. The distribution represents each group’s responsibility to the declination of the population. We sort the table by the decreasing order of the contribution, which intuitively understands which group has a more significant impact on the decline of the birth rate. The contribution makes a comprehensive summary of the fall of birth rate in the United States by combining various factors such as the population and the change of birth rate of each group; thus, it is a more credible and reliable reference than the simple change in the birth rate. 
+From the table, we can see that among all the demographic groups, the non-Hispanic white women have the highest contribution to the declination of birth rate, while its change in birth rate within the group is not the highest. 
+
+
+
+\newpage
+
+# Appendix
+
+For all the figures, we used the data table already been cleaned. In figure 1, the cleaned data (fig_1.csv) table includes two variables with 41 rows. Each entry in the table gives us the data for the birth rate across all the populations in the US annually from 1980 to 2020. The variable that represents the birth rate is named brate_all.  The information is visually demonstrated by a line graph (figure 1)
+
+Figures 2-5 are generated from the same data table (fig_1_2_3), with 23 variables with 51 rows. The variables used for each figure and their meanings are listed below:
+Figure 2 used variables including year, brate_1519, brate_2024, brate_2429, brate_3034, brate_3539, and brate_4044. The variable year represents the year when the data is collected. The variables starting with brate_ represent the birth rate for each age group in the current year, and the four digits represent the age group after each variable. For example, 1519 represents all women aged 15 to 19 in the United States.
+
+Figure 3 demonstrated the relationship between year, brate_whitenh, brate_blacknh, and brate_hisp. The variables starting with brate_ also represents the birth rate for each race, where brate_whitenh means the birth rate of non-Hispanic white women in the United States in the corresponding year brate_blacknh represents the birth rate of non-Hispanic black women in the United States in the corresponding year and brate_hisp represents the birth rate of Hispanic women in the United States in the corresponding year. 
+
+Figure 4 included the data of 5 variables including year, brate_native_mex, brate_foreign_mex, brate_native_hisp_nonmex, and brate_foreign_hisp_nonme. The table discusses the birth rate data for each subpopulation of Hispanic women. The variable brate_native_mex records the birth rata data for native-born Mexican women in the United States in the corresponding year. The variable brate_foreign_mex records the birth rata data for foreign-born Mexican women in the United States in the corresponding year. The variable brate_native_hisp_nonmex records the birth rata data for native-born non-Mexican women in the United States in the corresponding year. The variable brate_foreign_hisp_nonme records the birth rata data for foreign-born non-Mexican women in the United States in the corresponding year.
+
+Figure 5 used variable years and variables representing the birth rate for each parity. The variable brate_firstbirth shows the birth rate of first birth across all the women in the US. The variable brate_secondbirth shows the birth rate of second birth across all the women in the US.  The variable brate_thirdbirth shows the birth rate of third birth across all the women in the US.  The variable brate_fourthplusbirth shows the birth rate of fourth or more births across all the US women. 
+
+In table 1, we used 2 data tables. The first data table includes 22 variables with 1,113,498 rows. After cleaning and summarizing the data, we have four variables with 558 entries. The four variables are year, agegrp6, raceeth and pop. For each entry, the year variable represents the year when the data is collected, agegrp6 represents the age group of the population, and raceeth represents the race of the people represented by the data. Pop show the size of the people. The second data table has 85 variables with 19 rows. After data cleaning, the table has 19 variables with 19 rows.
+
+\newpage
+
+# References
+
+
+
