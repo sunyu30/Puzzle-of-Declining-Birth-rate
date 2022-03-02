@@ -5,7 +5,7 @@ author:
   - Yu Sun
   - Ariel Xu
   - Qiao Zhou
-thanks: "Code and data are available at: LINK."
+thanks: "Code and data are available at: https://github.com/sunyu30/Puzzle-of-Declining-Birth-rate"
 date: "`r format(Sys.time(), '%d %B %Y')`"
 abstract: " This paper replicates the 2022 article ‘The Puzzle of Falling US Birth Rates since the Great Recession”[@123]’, which explores the possible correlation between birth rates and different variables. The goal of our replicates is to improve upon the article and seek more possible relations to the decline in the birthrate. In the end, we have found more evidence through a different perspective to support the original result, and it was consistent "
 output: pdf_document
@@ -27,7 +27,7 @@ library(knitr)
 \newpage
 # Introduction
 
-It’s undoubtedly to say that the birth rate determines the future of a country. With the current medical technologies, we cannot achieve the state of immortality. For the past decade, it has been a problem that the birth rate is declining at a remarkable speed. According to the National Center for Health Statistics official record, the overall birth rate has achieved another low mark with 63.2 per 1000 women of childbearing age. [@kl] The overall U.S. birth rate has peaked during the baby boom, which reached 122.7 in 1957. [@cita] From observation, we hypothesized a connection between birth rate and recession, thinking that economic disaster will influence the economy.
+It’s undoubtedly to say that the birth rate determines the future of a country. With the current medical technologies, we cannot achieve the state of immortality. For the past decade, it has been a problem that the birth rate is declining at a remarkable speed. According to the National Center for Health Statistics official record, the overall birth rate has achieved another low mark with 63.2 per 1000 women of childbearing age. [@kl] The overall U.S. birth rate has peaked during the baby boom, which reached 122.7 in 1957. [@kl] From observation, we hypothesized a connection between birth rate and recession, thinking that economic disaster will influence the economy.
 
 This paper replicates "The Puzzle of Falling US Birth Rates since the Great Recession"[@123] primarily focuses on the effect of different factors contributing to the birth rate decline, such as education level, age, religious beliefs, and ethnicity. We aim to explore the data further to determine possible hidden associations. We have hypothesized a possible association between age and birth rate and between race and birth rate after the recession period; however, we have found no association between age and birth rate and indirection association between race and birth rate. 
 
